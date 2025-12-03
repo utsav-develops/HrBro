@@ -2,12 +2,12 @@ package com.project4n
 
 import android.app.Application
 import com.facebook.react.PackageList
-import com.facebook.react.ReactApplication
+import com.reactnativenavigation.NavigationApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 
-class MainApplication : Application(), ReactApplication {
+class MainApplication : NavigationApplication() {
 
   override val reactHost: ReactHost by lazy {
     getDefaultReactHost(

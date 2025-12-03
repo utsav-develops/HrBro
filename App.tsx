@@ -4,35 +4,73 @@
  *
  * @format
  */
-
+import { useState, useRef } from 'react';
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { StatusBar, StyleSheet, Text, useColorScheme, View, TouchableOpacity, } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
+import Lucide from '@react-native-vector-icons/lucide';
+
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+//Pages
+import Splash from './src/views/Splash';
+import Dashboard from './src/views/Dashboard';
+import Tools from './src/components/tools';
+import Evaluate from './src/views/Evaluate';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const Stack = createNativeStackNavigator();
+
+function RootStack() {
+  const headerButtonRef = useRef(null);
+  const [origin, setOrigin] = useState({x: 0, y: 0});
+  const navigation = useNavigation();
+
+  const openTools = () => {
+    headerButtonRef.current?.measure((x, y, width, height, px, py) => {
+      setOrigin({x,y});
+      navigation.setParams({openTools: true, origin: {x: px,y: py}});
+    });
+  };
+
+  return (
+    <Stack.Navigator initialRouteName="Home" >
+      <Stack.Screen name="Home"
+        component={Dashboard} 
+         options={({ navigation }: NativeStackScreenProps<any>) => ({
+          headerLeft: () => (
+            <TouchableOpacity onPress={ async () => {
+              const Page = await AsyncStorage.getItem('previousPage');
+              navigation.setParams({pageType : Page});
+            }} 
+            style={{alignItems:'center', justifyContent:'center',  marginLeft: 7}}>
+              <FontAwesome6 name="arrows-turn-to-dots" size={20} iconStyle='solid'/>
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+              <TouchableOpacity ref={headerButtonRef} style={{ alignItems:'center', justifyContent:'center', marginLeft: 10}} onPress={() => openTools()}>
+                <FontAwesome6 name="grip" size={20} iconStyle="solid" />
+              </TouchableOpacity>
+          ),
+          headerTransparent: true,
+          headerTitle: 'Hello 😁',
+        })}
+        />
+
+      <Stack.Screen name="Splash" component={Splash} />
+    </Stack.Navigator>
+  );
+}
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <NavigationContainer>
+       <RootStack />
+    </NavigationContainer>
   );
 }
 
