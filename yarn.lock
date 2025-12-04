@@ -3540,6 +3540,11 @@ event-target-shim@^5.0.0:
   resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
+events@^3.0.0:
+  version "3.3.0"
+  resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
+
 execa@^5.0.0:
   version "5.1.1"
   resolved "https://registry.npmjs.org/execa/-/execa-5.1.1.tgz"
@@ -5932,6 +5937,11 @@ react-native-blob-util@^0.24.4, react-native-blob-util@>=0.13.7:
     base-64 "0.1.0"
     glob "13.0.0"
 
+react-native-camera-kit@^16.1.3:
+  version "16.1.3"
+  resolved "https://registry.npmjs.org/react-native-camera-kit/-/react-native-camera-kit-16.1.3.tgz"
+  integrity sha512-mqOgFY8wON6YGaZVSP1eaH+fbcxIbUSgAaFlt5yLTz3H8Lc1Hl0IvQ4FlcC1lG5AbyqCyNqvK60kkgq5dWFnag==
+
 react-native-document-picker@^9.3.1:
   version "9.3.1"
   resolved "https://registry.npmjs.org/react-native-document-picker/-/react-native-document-picker-9.3.1.tgz"
@@ -5973,7 +5983,7 @@ react-native-progress@^5.0.1:
   dependencies:
     prop-types "^15.7.2"
 
-react-native-reanimated@^4.1.5:
+react-native-reanimated@*, react-native-reanimated@^4.1.5:
   version "4.1.5"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.1.5.tgz"
   integrity sha512-UA6VUbxwhRjEw2gSNrvhkusUq3upfD3Cv+AnB07V+kC8kpvwRVI+ivwY95ePbWNFkFpP+Y2Sdw1WHpHWEV+P2Q==
@@ -6003,6 +6013,11 @@ react-native-svg@*:
     css-tree "^1.1.3"
     warn-once "0.1.1"
 
+react-native-vision-camera@^4.7.3:
+  version "4.7.3"
+  resolved "https://registry.npmjs.org/react-native-vision-camera/-/react-native-vision-camera-4.7.3.tgz"
+  integrity sha512-g1/neOyjSqn1kaAa2FxI/qp5KzNvPcF0bnQw6NntfbxH6tm0+8WFZszlgb5OV+iYlB6lFUztCbDtyz5IpL47OA==
+
 react-native-worklets@^0.6.1, react-native-worklets@>=0.5.0:
   version "0.6.1"
   resolved "https://registry.npmjs.org/react-native-worklets/-/react-native-worklets-0.6.1.tgz"
@@ -6020,7 +6035,14 @@ react-native-worklets@^0.6.1, react-native-worklets@>=0.5.0:
     convert-source-map "^2.0.0"
     semver "7.7.2"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@>=0.46, react-native@0.82.1:
+react-native-zeroconf@^0.13.8:
+  version "0.13.8"
+  resolved "https://registry.npmjs.org/react-native-zeroconf/-/react-native-zeroconf-0.13.8.tgz"
+  integrity sha512-frGS1xNbNCA7BfETSubNYODu7s7mlU55vgArEzZW9EuSQ8SYqlNQC5zpKHDZEAXy4fFqe+CgnMCxKAjQqYM6XA==
+  dependencies:
+    events "^3.0.0"
+
+react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@>=0.46, react-native@>=0.60, react-native@0.82.1:
   version "0.82.1"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.82.1.tgz"
   integrity sha512-tFAqcU7Z4g49xf/KnyCEzI4nRTu1Opcx05Ov2helr8ZTg1z7AJR/3sr2rZ+AAVlAs2IXk+B0WOxXGmdD3+4czA==

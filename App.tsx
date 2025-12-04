@@ -19,7 +19,7 @@ import Splash from './src/views/Splash';
 import Dashboard from './src/views/Dashboard';
 import Tools from './src/components/tools';
 import Evaluate from './src/views/Evaluate';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { pageState } from './src/config/constant';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,13 +36,14 @@ function RootStack() {
   };
 
   return (
-    <Stack.Navigator initialRouteName="Home" >
+    <Stack.Navigator initialRouteName="Splash" >
       <Stack.Screen name="Home"
         component={Dashboard} 
          options={({ navigation }: NativeStackScreenProps<any>) => ({
           headerLeft: () => (
             <TouchableOpacity onPress={ async () => {
-              const Page = await AsyncStorage.getItem('previousPage');
+              const Page = pageState.prevPage;
+              pageState.headerTitle = Page;
               navigation.setParams({pageType : Page});
             }} 
             style={{alignItems:'center', justifyContent:'center',  marginLeft: 7}}>
@@ -51,15 +52,15 @@ function RootStack() {
           ),
           headerRight: () => (
               <TouchableOpacity ref={headerButtonRef} style={{ alignItems:'center', justifyContent:'center', marginLeft: 10}} onPress={() => openTools()}>
-                <FontAwesome6 name="grip" size={20} iconStyle="solid" />
+                <FontAwesome6 name="grip" size={20} iconStyle="solid"/>
               </TouchableOpacity>
           ),
           headerTransparent: true,
-          headerTitle: 'Hello 😁',
+          headerTitle: pageState.headerTitle,
         })}
         />
 
-      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="Splash" component={Splash} options={{headerShown: false}}/>
     </Stack.Navigator>
   );
 }

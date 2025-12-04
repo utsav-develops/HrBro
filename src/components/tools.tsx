@@ -8,6 +8,7 @@ import { Text } from 'react-native-gesture-handler';
 import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
 import Lucide from '@react-native-vector-icons/lucide';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { pageState } from '../config/constant';
 
 export default function Tools() {
   const route = useRoute();
@@ -19,7 +20,6 @@ export default function Tools() {
   const translateY = useSharedValue(origin.y);
 
   const navigation = useNavigation();
-
 
 
   React.useEffect(()=>{
@@ -74,21 +74,24 @@ export default function Tools() {
             ]}>
             <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom:15,}}>
 
-              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Evaluate"}); onClose(); AsyncStorage.setItem('previousPage', 'Chat'); }} style={[styles.box,{backgroundColor:'#59bd93'}]}>
+              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Evaluate"}); pageState.headerTitle = "Evaluate"; onClose();  }} style={[styles.box,{backgroundColor:'#59bd93'}]}>
                   <Lucide name='book-open-check' size={60} color={'#e5e4e4'}/>
                   <Text style={styles.text}>Evaluate CV</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Chat"}); onClose(); AsyncStorage.setItem('previousPage', 'Evaluate'); }} style={[styles.box,{backgroundColor:'#343e7b'}]}>
+              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Chat"}); pageState.headerTitle = "Chat"; onClose();  }} style={[styles.box,{backgroundColor:'#343e7b'}]}>
                   <Lucide name='keyboard' size={60} color={'#fbfbfb'}/>
                   <Text style={styles.text}>Chat AI</Text>
               </TouchableOpacity>
             </View>   
             <View style={{flexDirection:'row', justifyContent:'space-between',}}>
-              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Question"}); onClose(); AsyncStorage.setItem('previousPage', 'Evaluate'); }} style={[styles.box,{backgroundColor:'#F69B63'}]}>
+              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Question"}); pageState.headerTitle = "Question"; onClose();  }} style={[styles.box,{backgroundColor:'#F69B63'}]}>
                   <Lucide name='keyboard' size={60} color={'#fbfbfb'}/>
                   <Text style={styles.text}>Question Generator</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.box}></TouchableOpacity>
+              <TouchableOpacity onPress = {() => {navigation.setParams({pageType : "Scan"}); pageState.headerTitle = "Scan"; onClose();  }} style={[styles.box,{backgroundColor:'#A4ADC7'}]}>
+                  <Lucide name='scan-text' size={60} color={'#fbfbfb'}/>
+                  <Text style={styles.text}>Scan Document</Text>
+              </TouchableOpacity>
             </View>           
         </Animated.View>
         </>

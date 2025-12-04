@@ -1,11 +1,11 @@
 import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
-import React, { useState, useEffect, useEffectEvent } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, useColorScheme, StatusBar, Modal, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect, useEffectEvent, useRef } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, useColorScheme, StatusBar, Modal, TouchableOpacity, Alert, Image, Dimensions } from 'react-native';
 import { SafeAreaView, SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { BlurView } from '@react-native-community/blur';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
-import {api_url, modelChat, loading_anim, uploadFile, modelInference, modelQuestionGenerate} from '../config/constant.js';
+import {apiConfig, modelChat, loading_anim, uploadFile, modelInference,pageState, modelQuestionGenerate, extractText} from '../config/constant.js';
 import LottieView from 'lottie-react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import Lucide from '@react-native-vector-icons/lucide';
 import * as Progress from 'react-native-progress';
 import DocumentPicker from 'react-native-document-picker';
 import Pdf from 'react-native-pdf';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 
 export default function Dashboard() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -49,6 +50,8 @@ export default function Dashboard() {
 
   useEffect(()=>{
     if(route.params?.pageType){
+      pageState.prevPage = pageState?.currentPage;
+      pageState.currentPage = (route.params.pageType);
       setContentPage(route.params.pageType);
     }
   },[route.params?.pageType]);
@@ -105,7 +108,7 @@ export default function Dashboard() {
       })
       const response = await axios({
         method : 'post',
-        url: api_url + uploadFile,
+        url: apiConfig.api_url + uploadFile,
         data : data
       })
         console.log('response is ',response.data);
@@ -136,7 +139,7 @@ export default function Dashboard() {
     try{
       const response = await axios({
         method: 'post',
-        url: api_url + modelInference,
+        url: apiConfig.api_url + modelInference,
         data: {applicantCv: returnName.cv, jobDescription: returnName.job}
       }
     )
@@ -144,7 +147,7 @@ export default function Dashboard() {
       setEvaluationText(response.data.model_response.content);
     }
     catch (error) {
-      console.log(error)
+      console.log('error', error);
     }
     finally{
       setLoading(false);
@@ -217,16 +220,17 @@ export default function Dashboard() {
             }}
           style={[styles.outputContainer, {borderRadius: radius}]}
           >
-          <Text style={{textAlign:'auto', fontFamily:'ui-monospace',}}>{outputText}</Text>
+          <Text style={{textAlign:'auto', fontFamily:'ui-monospace',marginTop:140+insets.top,}}>{outputText}</Text>
         </View>
 
-        <View style={[ {width:'100%', height:60, flexDirection:'row', justifyContent:'space-between',}]}>
+        <View style={[ {width:'100%',flexDirection:'row', justifyContent:'space-between', alignItems:'flex-end' }]}>
             <TextInput 
-              style={{backgroundColor: '#fbfbfb',fontFamily:'ui-monospace',borderColor:'#343e7b', borderWidth:1, width:'80%', height:'100%', borderRadius: 100, justifyContent:'center', padding:20, color:'black'}}
+              style={{backgroundColor: '#fbfbfb',fontFamily:'ui-monospace',borderColor:'#343e7b', borderWidth:1, width:'80%', borderRadius: 40, justifyContent:'center', padding:20, color:'black'}}
               value={tempText}
               onChangeText={setTempText}
               placeholder='Write something...'
               placeholderTextColor={"#888"}
+              multiline
               >
             </TextInput>
             <View
@@ -235,7 +239,7 @@ export default function Dashboard() {
                   borderColor:'#343e7b',
                   borderWidth:1,
                   width: '15%',
-                  height: '100%',
+                  aspectRatio:1,
                   overflow: 'hidden',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -248,6 +252,7 @@ export default function Dashboard() {
                       :
                         <LottieView source={loading_anim} style={{ width: '100%', height: '100%', padding:10, }} autoPlay loop/>
                     }
+
                 </View>
             </View>
           </ScrollView>
@@ -269,7 +274,7 @@ export default function Dashboard() {
             :
             <Lucide name="clipboard-list" size={70} />
             }
-            <Text style={{fontFamily:'ui-monospace', fontSize:16}}>Job Description</Text>
+            <Text style={{fontFamily:'ui-monospace', fontSize:16, textAlign:'center'}}>Job Description</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={()=>pickPdf('cv')} style={{width:'45%',aspectRatio:1, borderColor:'#343E7B', borderWidth:2, alignItems:'center', justifyContent:'space-evenly', borderRadius:20,}}>
@@ -283,7 +288,7 @@ export default function Dashboard() {
             :
             <Lucide name="cloud-upload" size={70} />
             }
-            <Text style={{fontFamily:'ui-monospace', fontSize:16}}>Applicant CV</Text>
+            <Text style={{fontFamily:'ui-monospace', fontSize:16, textAlign:'center'}}>Applicant CV</Text>
           </TouchableOpacity>
           </View>
           {loading?
@@ -324,7 +329,7 @@ export default function Dashboard() {
             :
             <Lucide name="clipboard-list" size={70} />
             }
-            <Text style={{fontFamily:'ui-monospace', fontSize:16}}>Job Description</Text>
+            <Text style={{fontFamily:'ui-monospace', fontSize:16, textAlign:'center'}}>Job Description</Text>
           </TouchableOpacity>
           {loading?
           <Progress.Bar progress={progressTime} width={300} borderColor='#343E7B' color='#59BD93'/>
@@ -349,12 +354,91 @@ export default function Dashboard() {
   }
 
 
+
+  const ScanContent = () =>{
+    const cameraRef = useRef(null);
+    const device = useCameraDevice('back');
+    const { hasPermission } = useCameraPermission();
+    const [photo, setPhoto] = useState(null);
+    const [extractOutput, setExtractOutput] = useState("");
+
+    useEffect(()=>{
+       (async () => {
+      const status = await Camera.requestCameraPermission();
+    })();
+    },[]);
+
+      const extractApi = async (picName: string) => {
+        console.log("picName " + picName);
+        try{
+          const response = await axios({
+            method: 'post',
+            url: apiConfig.api_url + extractText,
+            data: {pictureName: picName}
+          })
+          console.log(response.data);
+          setExtractOutput(response.data);
+        }
+        catch(err){
+          console.log(err);
+        }
+      }
+
+    const takePhoto = async () =>{ 
+      const res = await cameraRef.current.takePhoto({
+        flash: 'off'
+      });
+      console.log(res);
+      setPhoto(res);
+
+      const response = await apiCall({uri:res.path, name:'photoclick.jpg'});
+      console.log(response);
+      extractApi(response.filename);
+   
+      }
+
+    if (!hasPermission) return <Text>No Permission...</Text>
+    if (device == null) return <Text>No Device</Text>;
+    
+    return(
+        <View style={StyleSheet.absoluteFill}>
+        {  extractOutput ? (
+          <View style={{justifyContent:'center', alignSelf:'center', top:300}}>
+            <Text>{extractOutput?.extractedText}</Text>
+            </View>
+        )
+        :
+        photo ? (
+          <Image
+            source={{uri: 'file://' + photo.path}} 
+            style={{flex: 1}}/>
+        ) 
+        :
+        (
+          <Camera
+            ref={cameraRef}
+            style={{flex:1, width:'100%',}}
+            device={device}
+            isActive={true}
+            photo={true}
+          />
+        )
+        }
+          <TouchableOpacity onPress={takePhoto} style={{position:'absolute', borderRadius:20, backgroundColor:'#59BD93', padding:16, bottom:40, alignSelf:'center'}} >
+            <Text>Click</Text>
+          </TouchableOpacity>
+        </View>
+
+    )
+  }
+
+
   const chat_with_model = async (prompt: string) => {
     setLoading(true);
     setOutputText("Ai is working on your answer 🤖 ...");
     axios({
       method: 'post',
-      url: api_url + modelChat,
+      url: apiConfig.api_url + modelChat,
       data: { user:'dazu', message: prompt}
     })
     .then(async response => {
@@ -374,7 +458,7 @@ export default function Dashboard() {
     try{
       const response = await axios({
         method: 'post',
-        url: api_url + modelQuestionGenerate,
+        url: apiConfig.api_url + modelQuestionGenerate,
         data:{jobDescription: returnName.job}
       })
       console.log(response);
@@ -403,6 +487,9 @@ export default function Dashboard() {
       : contentPage == 'Question' ? (
         <><QuestionContent/></>
       )
+      : contentPage == 'Scan' ?(
+        <ScanContent/>
+      ) 
       :
       (<></>)
       }
@@ -440,6 +527,7 @@ const styles = StyleSheet.create({
     opacity:1,
     top:40,
     width:'90%',
+    marginBottom:300,
     borderColor:'#343E7B',
     borderWidth:1,
   },
@@ -450,7 +538,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     flexDirection:'column',
-    bottom:40,
+    bottom:10,
   },
 
   evalContainer: {
