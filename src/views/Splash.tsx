@@ -84,9 +84,9 @@ const Splash: React.FC = () => {
             <Text style={{fontFamily:'ui-monospace', marginBottom:10,}}>Server Lists</Text>
             {serverScreen?
             <>
-              {listServer != ({})?
+              {listServer != null ?
               <>
-              <View style={{width:'80%', flexDirection:'row', alignItems:'center',borderRadius:20, justifyContent:'space-between', borderWidth:2, borderColor:'#343E7B', padding:12,}}>
+              <View style={{width:'90%', flexDirection:'row', alignItems:'center',borderRadius:20, justifyContent:'space-between', borderWidth:2, borderColor:'#343E7B', padding:12,}}>
                 <View>
                   <Text>{JSON.stringify(listServer?.name)}</Text>
                   <Text style={{color:'grey', fontSize:13}}>{JSON.stringify(listServer?.addresses)}</Text>
@@ -106,7 +106,8 @@ const Splash: React.FC = () => {
           }
 
             <TouchableOpacity onPress={()=>{
-              setListServer({});
+              console.log(listServer);
+              setListServer(null);
               setReload(!reload);
               }} style={{backgroundColor:'#F69B63', padding:16, borderRadius:20, marginTop:40,}}>
               <Text>Reload</Text>

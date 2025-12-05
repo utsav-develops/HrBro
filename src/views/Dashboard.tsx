@@ -15,9 +15,10 @@ import * as Progress from 'react-native-progress';
 import DocumentPicker from 'react-native-document-picker';
 import Pdf from 'react-native-pdf';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import RNFS from "react-native-fs"
 
 export default function Dashboard() {
-  const isDarkMode = useColorScheme() === 'dark';
+ 
   const [outputText, setOutputText] = useState("");
   const [evaluationText, setEvaluationText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -99,6 +100,7 @@ export default function Dashboard() {
   }
 
   const apiCall = async (fileUri) => {
+    setLoading(true);
     try{
       const data = new FormData();
       data.append("file",{
@@ -118,6 +120,7 @@ export default function Dashboard() {
         console.log(error);
 
       }
+
     };
 
 
@@ -369,6 +372,7 @@ export default function Dashboard() {
     },[]);
 
       const extractApi = async (picName: string) => {
+        setLoading(true);
         console.log("picName " + picName);
         try{
           const response = await axios({
@@ -381,6 +385,9 @@ export default function Dashboard() {
         }
         catch(err){
           console.log(err);
+        }
+        finally{
+          setLoading(false);
         }
       }
 
@@ -404,7 +411,11 @@ export default function Dashboard() {
         <View style={StyleSheet.absoluteFill}>
         {  extractOutput ? (
           <View style={{justifyContent:'center', alignSelf:'center', top:300}}>
+            {extractOutput?.extractedText != '' ?
             <Text>{extractOutput?.extractedText}</Text>
+            :
+            <Text>Looks like there were no texts to scan 😢</Text>
+            }
             </View>
         )
         :
@@ -415,6 +426,7 @@ export default function Dashboard() {
         ) 
         :
         (
+          <>
           <Camera
             ref={cameraRef}
             style={{flex:1, width:'100%',}}
@@ -422,11 +434,14 @@ export default function Dashboard() {
             isActive={true}
             photo={true}
           />
-        )
-        }
           <TouchableOpacity onPress={takePhoto} style={{position:'absolute', borderRadius:20, backgroundColor:'#59BD93', padding:16, bottom:40, alignSelf:'center'}} >
             <Text>Click</Text>
           </TouchableOpacity>
+          </>
+        )
+        }
+        
+
         </View>
 
     )
@@ -474,10 +489,7 @@ export default function Dashboard() {
 
   return (
     <View style={{flex:1, backgroundColor:'#fbfbfb', justifyContent:'center', alignItems:'center'}}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={isDarkMode ? '#000' : '#fff'}
-      />
+
       { contentPage == 'Chat' ?(
         <><ChatContent/></>
       )
